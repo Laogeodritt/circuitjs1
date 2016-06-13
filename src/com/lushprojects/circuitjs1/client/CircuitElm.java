@@ -551,8 +551,10 @@ public abstract class CircuitElm implements Editable {
     else
     	s=showFormat;
 	double va = Math.abs(v);
-	if (va < 1e-14)
+	if (va < 1e-17)
 	    return "0 " + u;
+	if (va < 1e-12)
+		return s.format(v*1e15) + " f" + u;
 	if (va < 1e-9)
 	    return s.format(v*1e12) + " p" + u;
 	if (va < 1e-6)
@@ -567,7 +569,9 @@ public abstract class CircuitElm implements Editable {
 	    return s.format(v*1e-3) + " k" + u;
 	if (va < 1e9)
 	    return s.format(v*1e-6) + " M" + u;
-	return s.format(v*1e-9) + " G" + u;
+	if (va < 1e12)
+		return s.format(v*1e-9) + " G" + u;
+	return s.format(v*1e-12) + " T" + u;
     }
     
     /*

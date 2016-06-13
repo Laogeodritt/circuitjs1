@@ -158,6 +158,8 @@ class EditDialog extends DialogBox  {
 		if (ei.dimensionless)
 			return noCommaFormat.format(v);
 		if (v == 0) return "0";
+		if (va < 1e-12)
+			return noCommaFormat.format(v*1e15) + " f";
 		if (va < 1e-9)
 			return noCommaFormat.format(v*1e12) + "p";
 		if (va < 1e-6)
@@ -172,18 +174,21 @@ class EditDialog extends DialogBox  {
 			return noCommaFormat.format(v*1e-3) + "k";
 		if (va < 1e9)
 			return noCommaFormat.format(v*1e-6) + "M";
-		return noCommaFormat.format(v*1e-9) + "G";
+		if (va < 1e12)
+			return noCommaFormat.format(v*1e-9) + " G";
+		return noCommaFormat.format(v*1e-12) + " T";
 	}
 
 	double parseUnits(EditInfo ei) throws java.text.ParseException {
 		String s = ei.textf.getText();
 		s = s.trim();
 		// rewrite shorthand (eg "2k2") in to normal format (eg 2.2k) using regex
-		s=s.replaceAll("([0-9]+)([pPnNuUmMkKgG])([0-9]+)", "$1.$3$2");
+		s=s.replaceAll("([0-9]+)([fFpPnNuUmMkKgGtT])([0-9]+)", "$1.$3$2");
 		int len = s.length();
 		char uc = s.charAt(len-1);
 		double mult = 1;
 		switch (uc) {
+		case 'f': case 'F': mult = 1e-15; break;
 		case 'p': case 'P': mult = 1e-12; break;
 		case 'n': case 'N': mult = 1e-9; break;
 		case 'u': case 'U': mult = 1e-6; break;
@@ -194,6 +199,7 @@ class EditDialog extends DialogBox  {
 		case 'k': case 'K': mult = 1e3; break;
 		case 'M': mult = 1e6; break;
 		case 'G': case 'g': mult = 1e9; break;
+		case 'T': case 't': mult = 1e12; break;
 		}
 		if (mult != 1)
 			s = s.substring(0, len-1).trim();
